@@ -1,12 +1,21 @@
 # Smart-Garage
 
+**Smart Garage** is an Arduino-based automation system designed to enhance the safety, efficiency, and intelligence of a typical garage. This project integrates multiple sensors and modules to provide smart features such as fire detection, automated gate control, vehicle tracking, and more.
+
 # Team Members
 - Shahd Ayman Rezk
 - Sama Ezz-Eldeen
 - Nada Hesham
 - Roaa Adb-Elazeem
 
-**Smart Garage** is an Arduino-based automation system designed to enhance the safety, efficiency, and intelligence of a typical garage. This project integrates multiple sensors and modules to provide smart features such as fire detection, automated gate control, vehicle tracking, and more.
+# Figures
+![1](deliverables/1.jpg)
+
+
+![2](deliverables/2.jpg)
+
+
+![3](deliverables/3.jpg)
 
 # Key Features
 

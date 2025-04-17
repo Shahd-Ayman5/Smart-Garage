@@ -1,0 +1,225 @@
+#include<Servo.h>     // open gating 
+Servo the_servo;
+#define ir1 4
+#define ir2 5
+#define gate 6
+
+#define g 13   //7 segment
+#define f 12
+#define a 9
+#define b 10
+#define e A0
+#define d A1
+#define c A2
+int i=0; 
+bool curr1 = 1;
+bool curr2 = 1;
+bool pre1;
+bool pre2;
+int count = 5;
+int degree=0;               //end gating
+
+#define fire_sensor 2       //open fire alarm
+#define buzer_fire 11       //end fire alarm
+
+#define buzpin 3        //open ultraconic
+#define trigpin 8
+#define echopin 7  
+int sonartime;
+int dist;                      //close ultraconic
+        
+#define ldr A3         //led
+#define led A4          //led
+ 
+void setup()                                         //open void set up 
+ {
+ the_servo.attach(gate);        // set gating system
+pinMode (ir1,INPUT);
+pinMode (ir2,INPUT);
+pinMode (a,OUTPUT);
+pinMode (g,OUTPUT);
+pinMode (f,OUTPUT);
+pinMode (b,OUTPUT);
+pinMode (e,OUTPUT);
+pinMode (d,OUTPUT);
+pinMode (c,OUTPUT);
+the_servo.write(0);           //end set gating system
+
+pinMode(buzer_fire, OUTPUT);   //set fire alarm
+pinMode(fire_sensor, INPUT);    //end set fire alarm
+
+ pinMode(buzpin,OUTPUT);        // set ultraconi
+  pinMode(echopin,INPUT);
+  pinMode(trigpin,OUTPUT);
+  Serial.begin(9600);         // end set ultraconic
+
+  pinMode(led, OUTPUT);      // set light
+  pinMode(ldr, INPUT);       // end set light
+
+
+ }                                                //close void set up
+ void loop()                                       //open void loop
+ {
+ if(degree==0)                        //open gating system
+   {
+     pre1 = curr1;
+     curr1=digitalRead(ir1);
+     pre2 = curr2;
+     curr2=digitalRead(ir2);
+     
+     if((curr1==0)&&(pre1==1))
+       {
+        if (count>0)
+         {
+          for(int i=0;i<91;i=i+5)
+      {the_servo.write(i);
+             delay(100);}
+          degree=90;
+         }
+       }
+    else if ((curr2==0)&&(pre2==1))
+          {
+           for(int i=0;i<91;i=i+5)
+         {the_servo.write(i);
+               delay(100);}
+              degree=90;
+          }
+   }
+  if(degree==90)
+   {
+     pre1 = curr1;
+     curr1=digitalRead(ir1);
+     pre2 = curr2;
+     curr2=digitalRead(ir2);
+     
+   if((curr2==0)&&(pre2==1))
+     {
+        for(int i=90;i>=0;i=i-5)
+      {the_servo.write(i);
+      delay(100);}
+     degree=0;
+      count--;
+   }
+   else if ((curr1==0)&&(pre1==1))
+   {
+     for(int i=90;i>=0;i=i-5)
+       {the_servo.write(i);
+        delay(100);}
+       degree=0;
+       count++;
+  }
+ }
+ 
+  
+ if(count==5)               //7 segment open
+ {
+ digitalWrite(a,HIGH);
+digitalWrite(f,HIGH);
+digitalWrite(g,HIGH);
+analogWrite(c,255);
+analogWrite(d,255);
+digitalWrite(b,LOW);
+analogWrite(e,0); 
+ }
+else if(count==4)  
+{
+ digitalWrite(a,LOW);
+digitalWrite(b,HIGH);
+analogWrite(d,0); 
+ analogWrite(e,0);
+ digitalWrite(g,HIGH);
+ digitalWrite(f,HIGH);
+ analogWrite(c,255);
+}
+else if (count==3)
+{ 
+ digitalWrite(a,HIGH);
+analogWrite(d,255);
+digitalWrite(f,LOW);
+ analogWrite(e,0);
+ digitalWrite(g,HIGH);
+ analogWrite(c,255);
+ digitalWrite(b,HIGH);
+}
+ else if(count==2)
+ {
+analogWrite(e,255);
+analogWrite(c,0);
+ digitalWrite(a,HIGH);
+ digitalWrite(b,HIGH);
+ digitalWrite(g,HIGH);
+ analogWrite(d,255);
+ digitalWrite(f,LOW);
+ }
+ else if(count==1)
+ {    
+ analogWrite(e,255);
+digitalWrite(g,LOW);
+analogWrite(d,0);
+digitalWrite(a,LOW);
+analogWrite(c,0);
+digitalWrite(f,HIGH);
+digitalWrite(b,LOW);
+ } 
+  else if(count==0)
+ {
+digitalWrite(a,HIGH);
+digitalWrite(f,HIGH);
+digitalWrite(b,HIGH);
+digitalWrite(g,LOW);
+analogWrite(d,255);
+analogWrite(c,255);
+analogWrite(e,255);
+ }                    //7 segment close                            // end of gating system
+
+
+int reading_fire = digitalRead(fire_sensor);                         // starting fire alarm
+  if (reading_fire)
+  {
+  tone(buzer_fire,800);
+   //for(;i<=90;i=i+5)
+  // {
+   //   the_servo.write(i);
+   //   delay(100);
+   // }
+
+  }
+  else
+{
+ noTone(buzer_fire);
+  // for(;i>=0;i=i-5)
+   //{
+   //   the_servo.write(i);
+     // delay(100);
+//   }
+}                                                            //end of fire alarm
+
+
+int reading_ldr= analogRead(ldr);                              // starting of light
+int reading_led= map(reading_ldr,6,679,0,255);
+analogWrite(led, reading_led);
+Serial.println(reading_led);                                  // end of light
+
+
+  digitalWrite(trigpin,LOW);                                     // starting of ultrasonic
+  digitalWrite(trigpin,HIGH);
+  delayMicroseconds(10);
+   digitalWrite(trigpin,LOW);
+
+  sonartime=(pulseIn(echopin,HIGH))/2;
+  dist=0.035*sonartime;
+   Serial.println(dist);
+
+  delay(50);
+   if(dist<=2)
+   {
+    tone(buzpin,200);
+    delay(500);
+     noTone(buzpin);
+     delay(500);
+    }
+    else
+    {
+      noTone(buzpin);
+}                                                            // end of ultrasonic
+}                                                    // end void loop
